@@ -31,7 +31,6 @@
 
 ######## SGX SDK Settings ########
 
-
 SGX_SDK ?= /opt/intel/sgxsdk
 SGX_MODE ?= SIM
 SGX_ARCH ?= x64
@@ -148,6 +147,8 @@ endif
 endif
 
 
+
+
 .PHONY: all run
 
 ifeq ($(Build_Mode), HW_RELEASE)
@@ -160,8 +161,6 @@ all: $(App_Name) $(Enclave_Name)
 	@echo "To build the project in simulation mode set SGX_MODE=SIM. To build the project in prerelease mode set SGX_PRERELEASE=1 and SGX_MODE=HW."
 else
 all: $(App_Name) $(Signed_Enclave_Name)
-export SGX_SDK = SGX_SDK_PATH
-export LD_LIBRARY_PATH = SGX_SDK/sdk_libs
 endif
 
 run: all
@@ -169,6 +168,8 @@ ifneq ($(Build_Mode), HW_RELEASE)
 	@$(CURDIR)/$(App_Name)
 	@echo "RUN  =>  $(App_Name) [$(SGX_MODE)|$(SGX_ARCH), OK]"
 endif
+
+
 
 ######## App Objects ########
 

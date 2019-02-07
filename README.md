@@ -2,15 +2,16 @@
 This code relies on the linux-sgx-driver from: https://github.com/intel/linux-sgx-driver
 It also assumes you have the SGX SDK installed from: https://github.com/intel/linux-sgx
 
-Once the latter is installed, it will print output indicating where your SGXSDK lives. This will be used as the environment variable for the Makefile.
+Before running `make` in any new shell, you must first source your SGX SDK environment file. Its location is dependent on where you installed the SDK, and is printed upon installation of the SDK. It will take a form that looks something like:
 
+`/home/user/linux-sgx/linux/installer/bin/sgxsdk/environment`
 
-To make the executable install the driver and SDK (see above), then run:
+The commands to compile and run the code are:
+`source <yourpath>`
 
-make SGX_SDK={your SGXSDK path}
+`make`
 
-Example: make SGX_SDK=/home/user/linux-sgx/linux/installer/bin/sgxsdk
-
+`./app`
 
 
 ## What this code does
@@ -25,9 +26,9 @@ This code launches one SGX enclave containing a default string. An application o
 7) ask the enclave to emit the new reversed string.
 
 ## Details
-The untrusted application's functions are specified in ./App/App.cpp.
-The enclave's functions are specified in ./Enclave/Enclave.cpp.
-The enclave's interface to the application is specified in ./Enclave/Enclave.edl.
+- The untrusted application's functions are specified in **./App/App.cpp**.
+- The enclave's functions are specified in **./Enclave/Enclave.cpp**.
+- The enclave's interface to the application is specified in **./Enclave/Enclave.edl**.
 
 The enclave contains:
 - One char array to store strings (saved_string[]), which reads "Default enclave saved text" by default.
