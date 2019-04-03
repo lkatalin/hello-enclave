@@ -37,7 +37,7 @@ SGX_ARCH ?= x64
 
 ifeq ($(shell getconf LONG_BIT), 32)
 	SGX_ARCH := x86
-else ifeq ($(findstring -m32, $(CXXFLAGS)), -m32)
+else ifeq ($(findstring -m32, $(CCFLAGS)), -m32)
 	SGX_ARCH := x86
 endif
 
@@ -74,7 +74,7 @@ else
 endif
 
 # App_Cpp_Files := App/App.cpp $(wildcard App/Edger8rSyntax/*.cpp) $(wildcard App/TrustedLibrary/*.cpp)
-App_Cpp_Files := App/App.cpp App/sgx_utils/sgx_utils.cpp
+App_C_Files := App/App.c
 # App_Include_Paths := -IInclude -IApp -I$(SGX_SDK)/include
 App_Include_Paths := -IApp -I$(SGX_SDK)/include
 
@@ -92,7 +92,7 @@ else
 		App_C_Flags += -DNDEBUG -UEDEBUG -UDEBUG
 endif
 
-App_Cpp_Flags := $(App_C_Flags) -std=c++11
+#App_Cpp_Flags := $(App_C_Flags) -std=c++11
 App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
 
 ifneq ($(SGX_MODE), HW)
@@ -101,7 +101,7 @@ else
 	App_Link_Flags += -lsgx_uae_service
 endif
 
-App_Cpp_Objects := $(App_Cpp_Files:.cpp=.o)
+App_C_Objects := $(App_C_Files:.c=.o)
 
 App_Name := app
 
@@ -118,12 +118,12 @@ Crypto_Library_Name := sgx_tcrypto
 
 # Enclave_Cpp_Files := Enclave/Enclave.cpp $(wildcard Enclave/Edger8rSyntax/*.cpp) $(wildcard Enclave/TrustedLibrary/*.cpp)
 #Enclave_Cpp_Files := Enclave/Enclave.cpp Enclave/Sealing/Sealing.cpp
-Enclave_Cpp_Files := Enclave/Enclave.cpp
+Enclave_C_Files := Enclave/Enclave.c
 # Enclave_Include_Paths := -IInclude -IEnclave -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
 Enclave_Include_Paths := -IEnclave -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
 
 Enclave_C_Flags := $(SGX_COMMON_CFLAGS) -nostdinc -fvisibility=hidden -fpie -fstack-protector $(Enclave_Include_Paths)
-Enclave_Cpp_Flags := $(Enclave_C_Flags) -std=c++03 -nostdinc++
+#Enclave_Cpp_Flags := $(Enclave_C_Flags) -std=c++03 -nostdinc++
 Enclave_Link_Flags := $(SGX_COMMON_CFLAGS) -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles -L$(SGX_LIBRARY_PATH) \
 	-Wl,--whole-archive -l$(Trts_Library_Name) -Wl,--no-whole-archive \
 	-Wl,--start-group -lsgx_tstdc -lsgx_tstdcxx -l$(Crypto_Library_Name) -l$(Service_Library_Name) -Wl,--end-group \
@@ -132,7 +132,7 @@ Enclave_Link_Flags := $(SGX_COMMON_CFLAGS) -Wl,--no-undefined -nostdlib -nodefau
 	-Wl,--defsym,__ImageBase=0
 	# -Wl,--version-script=Enclave/Enclave.lds
 
-Enclave_Cpp_Objects := $(Enclave_Cpp_Files:.cpp=.o)
+Enclave_C_Objects := $(Enclave_C_Files:.c=.o)
 
 Enclave_Name := enclave.so
 Signed_Enclave_Name := enclave.signed.so
@@ -181,12 +181,12 @@ App/Enclave_u.o: App/Enclave_u.c
 	@$(CC) $(App_C_Flags) -c $< -o $@
 	@echo "CC   <=  $<"
 
-App/%.o: App/%.cpp
-	@$(CXX) $(App_Cpp_Flags) -c $< -o $@
-	@echo "CXX  <=  $<"
+App/%.o: App/%.c
+	@$(CC) $(App_C_Flags) -c $< -o $@
+	@echo "CC  <=  $<"
 
-$(App_Name): App/Enclave_u.o $(App_Cpp_Objects)
-	@$(CXX) $^ -o $@ $(App_Link_Flags)
+$(App_Name): App/Enclave_u.o $(App_C_Objects)
+	@$(CC) $^ -o $@ $(App_Link_Flags)
 	@echo "LINK =>  $@"
 
 
@@ -200,12 +200,12 @@ Enclave/Enclave_t.o: Enclave/Enclave_t.c
 	@$(CC) $(Enclave_C_Flags) -c $< -o $@
 	@echo "CC   <=  $<"
 
-Enclave/%.o: Enclave/%.cpp
-	@$(CXX) $(Enclave_Cpp_Flags) -c $< -o $@
-	@echo "CXX  <=  $<"
+Enclave/%.o: Enclave/%.c
+	@$(CC) $(Enclave_C_Flags) -c $< -o $@
+	@echo "CC  <=  $<"
 
-$(Enclave_Name): Enclave/Enclave_t.o $(Enclave_Cpp_Objects)
-	@$(CXX) $^ -o $@ $(Enclave_Link_Flags)
+$(Enclave_Name): Enclave/Enclave_t.o $(Enclave_C_Objects)
+	@$(CC) $^ -o $@ $(Enclave_Link_Flags)
 	@echo "LINK =>  $@"
 
 $(Signed_Enclave_Name): $(Enclave_Name)
@@ -215,4 +215,4 @@ $(Signed_Enclave_Name): $(Enclave_Name)
 .PHONY: clean
 
 clean:
-	@rm -f $(App_Name) $(Enclave_Name) $(Signed_Enclave_Name) $(App_Cpp_Objects) App/Enclave_u.* $(Enclave_Cpp_Objects) Enclave/Enclave_t.*
+	@rm -f $(App_Name) $(Enclave_Name) $(Signed_Enclave_Name) $(App_C_Objects) App/Enclave_u.* $(Enclave_C_Objects) Enclave/Enclave_t.*
