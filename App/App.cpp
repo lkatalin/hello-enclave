@@ -61,4 +61,5 @@ int main(int argc, char const *argv[]) {
     printf("App: Received reversed stored string from Enclave: %s\n\n", string_from_enclave);
 
     return 0;
+
 }
