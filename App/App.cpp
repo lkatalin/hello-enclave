@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include <iostream>
 #include "Enclave_u.h"
 #include "sgx_urts.h"
-#include "sgx_utils/sgx_utils.h"
+
 
 /* Global EID for enclave */
 sgx_enclave_id_t global_eid = 0;
@@ -11,10 +10,18 @@ int main(int argc, char const *argv[]) {
 
     // a string originating from within the untrusted App
     char app_secret_string[] = "App's secret string";
- 
-    if (initialize_enclave(&global_eid, "enclave.token", "enclave.signed.so") < 0) {
-        std::cout << "Fail to initialize enclave." << std::endl;
-        return 1;
+   
+    // parameters to initialize enclave instance
+    sgx_status_t ret = SGX_ERROR_UNEXPECTED;
+    const char *enclave_name = "enclave.signed.so";
+    sgx_launch_token_t token = {0};
+    int updated = 0;
+
+    // initialize an enclave instance (for debug support: set 2nd parameter to 1)
+    ret = sgx_create_enclave(enclave_name, SGX_DEBUG_FLAG, &token, &updated, &global_eid, NULL);
+    if (ret != SGX_SUCCESS) {
+        printf("Error: %s; Failed to initialize enclave", ret);
+	return 1;
     }
 
     // ask enclave with ID 'global_eid' to reverse the string we pass from app_secret_string
