@@ -1,9 +1,6 @@
 enclave {
     trusted {
         /* define ECALLs here. */
-        public void enclave_string_save([in, size=100] char *input);
-        public void enclave_output_saved_string([out, size=len] char *output, size_t len);
-        public void enclave_reverse_string(void);
+	public void enclave_string_reverse([in, out, size=100] char *string);
     };
-
 };
