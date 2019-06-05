@@ -1,3 +1,6 @@
+## Note
+This README has not been updated to reflect code cleanup from the echoserver branch. The functionality is mostly as described below, with some pruning and merging of functions.
+
 ## To run
 This code relies on the linux-sgx-driver from: https://github.com/intel/linux-sgx-driver
 It also assumes you have the SGX SDK installed from: https://github.com/intel/linux-sgx
