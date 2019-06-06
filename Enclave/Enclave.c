@@ -1,4 +1,3 @@
-#include <cstring>
 #include <string.h>
 #include "Enclave_t.h"
 
